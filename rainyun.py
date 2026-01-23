@@ -37,6 +37,17 @@ except Exception as e:
 
     def send(title, content):
         pass
+
+# 服务器管理模块（可选功能，需要配置 API_KEY）
+ServerManager = None
+_server_manager_error = None
+try:
+    from server_manager import ServerManager
+
+    print("✅ 服务器管理模块加载成功")
+except Exception as e:
+    print(f"⚠️ 服务器管理模块加载失败：{e}")
+    _server_manager_error = str(e)
 # 创建一个内存缓冲区，用于存储所有日志
 log_capture_string = io.StringIO()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -382,12 +393,8 @@ def run():
         linux = os.environ.get("LINUX_MODE", "true").lower() == "true"
         debug = os.environ.get("DEBUG", "false").lower() == "true"
 
-        ver = "2.2"
-        logger.info("------------------------------------------------------------------")
-        logger.info(f"雨云签到工具 v{ver} - 稳定性优化版")
-        logger.info("二改仓库: https://github.com/Jielumoon/Rainyun-Qiandao")
-        logger.info("原作者: SerendipityR | https://github.com/SerendipityR-2022/Rainyun-Qiandao")
-        logger.info("------------------------------------------------------------------")
+        ver = "2.3"
+        logger.info(f"━━━━━━ 雨云签到 v{ver} ━━━━━━")
 
         delay = random.randint(0, max_delay)
         delay_sec = random.randint(0, 60)
@@ -473,14 +480,34 @@ def run():
         except:
             pass
 
-        # 2. 获取所有日志内容
+        # 2. 服务器到期检查和自动续费（需要配置 API_KEY）
+        server_report = ""
+        api_key = os.environ.get("RAINYUN_API_KEY", "")
+        if api_key and ServerManager:
+            logger.info("━━━━━━ 开始检查服务器状态 ━━━━━━")
+            try:
+                manager = ServerManager(api_key)
+                result = manager.check_and_renew()
+                server_report = "\n\n" + manager.generate_report(result)
+                logger.info("服务器检查完成")
+            except Exception as e:
+                logger.error(f"服务器检查失败: {e}")
+                server_report = f"\n\n⚠️ 服务器检查失败: {e}"
+        elif api_key and not ServerManager:
+            # 修复：配置了 API_KEY 但模块加载失败时明确告警
+            logger.error(f"已配置 RAINYUN_API_KEY 但服务器管理模块加载失败: {_server_manager_error}")
+            server_report = f"\n\n⚠️ 服务器管理模块加载失败: {_server_manager_error}"
+        elif not api_key:
+            logger.info("未配置 RAINYUN_API_KEY，跳过服务器管理功能")
+
+        # 3. 获取所有日志内容
         log_content = log_capture_string.getvalue()
 
-        # 3. 发送通知
+        # 4. 发送通知（签到日志 + 服务器状态，一次性推送）
         logger.info("正在发送通知...")
-        send("雨云签到", log_content)
+        send("雨云签到", log_content + server_report)
 
-        # 4. 释放内存
+        # 5. 释放内存
         log_capture_string.close()
 
 

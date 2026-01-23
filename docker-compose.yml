@@ -10,6 +10,11 @@ services:
       - TIMEOUT=${TIMEOUT:-15}              # 连接超时等待(秒)
       - MAX_DELAY=${MAX_DELAY:-90}          # 最大随机等待延时(分钟)
       - DEBUG=${DEBUG:-false}               # 调试模式
+      # 服务器管理功能 (可选)
+      - RAINYUN_API_KEY=${RAINYUN_API_KEY:-}           # API密钥
+      - AUTO_RENEW=${AUTO_RENEW:-true}                 # 自动续费开关
+      - RENEW_THRESHOLD_DAYS=${RENEW_THRESHOLD_DAYS:-7}  # 续费触发阈值
+    # - PUSH_KEY=${PUSH_KEY}     #配置server酱key
     volumes:
       - ./temp:/app/temp                    # 临时文件目录
       - ./cookies.json:/app/cookies.json    # 持久化 cookies

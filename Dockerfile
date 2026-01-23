@@ -7,6 +7,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 安装 Chromium 和依赖（支持 ARM 和 AMD64）
 RUN apt-get update && apt-get install -y \
+    ca-certificates \
     chromium \
     chromium-driver \
     libglib2.0-0 \
@@ -42,6 +43,8 @@ RUN pip install --upgrade pip setuptools wheel && \
 COPY rainyun.py .
 COPY notify.py .
 COPY stealth.min.js .
+COPY api_client.py .
+COPY server_manager.py .
 
 # 设置环境变量默认值
 ENV RAINYUN_USER=""
@@ -49,6 +52,10 @@ ENV RAINYUN_PWD=""
 ENV TIMEOUT=15
 ENV MAX_DELAY=90
 ENV DEBUG=false
+# 服务器管理功能（可选）
+ENV RAINYUN_API_KEY=""
+ENV AUTO_RENEW=true
+ENV RENEW_THRESHOLD_DAYS=7
 # Chromium 路径（Debian 系统）
 ENV CHROME_BIN=/usr/bin/chromium
 ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
