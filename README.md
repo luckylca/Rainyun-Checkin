@@ -1,9 +1,6 @@
 # 🌧️ 雨云自动签到 (GitHub Actions 版) v2.5
 
-[https://img.shields.io/badge/GitHub_Actions-自动签到-blue.svg](https://github.com/features/actions)
-[https://img.shields.io/badge/Python-3.9+-yellow.svg](https://python.org)
-[https://img.shields.io/badge/License-MIT-green.svg](LICENSE)
-[https://img.shields.io/badge/Selenium-4.20.0-orange.svg](https://selenium.dev)
+
 
 雨云（Rainyun）每日自动签到工具，支持 **GitHub Actions 一键部署**，无需服务器即可实现每日自动签到、积分累计。
 
